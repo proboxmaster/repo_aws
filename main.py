@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 # === CARGAR VARIABLES DE ENTORNO ===
 load_dotenv()
 API_KEY = os.environ["API_KEY"]
-DATABASE_URL = os.environ["DATABASE_URL_2"]
+DATABASE_URL = os.environ["DATABASE_URL"]
 REPORT_NAME = "DB_TENDENCIAS"
 COUNTRY_NAME = "ve"
 
