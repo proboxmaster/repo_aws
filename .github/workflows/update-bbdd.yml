@@ -26,5 +26,5 @@ jobs:
       - name: Ejecutar script principal
         env:
           API_KEY: ${{ secrets.API_KEY }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL_2 }}
         run: python main.py
