@@ -1,0 +1,4 @@
+pandas
+tikapi
+psycopg2-binary
+python-dotenv
