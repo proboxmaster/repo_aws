@@ -5,15 +5,14 @@ import os
 import psycopg2
 from dotenv import load_dotenv
 
-# === CARGAR VARIABLES DE ENTORNO ===
+# === CARGAR VARIABLES DEL ENTORNO ===
 load_dotenv()
-API_KEY = os.environ("API_KEY")
-DATABASE_URL = os.environ("DATABASE_URL")
+API_KEY = os.getenv("API_KEY")
+DATABASE_URL = os.getenv("DATABASE_URL")
 REPORT_NAME = "DB_TENDENCIAS"
 COUNTRY_NAME = "ve"
 
-def crear_tabla_si_no_existe():
-    conn = psycopg2.connect(DATABASE_URL)
+def crear_tabla_si_no_existe(conn):
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS tendencias_tiktok (
@@ -40,7 +39,6 @@ def crear_tabla_si_no_existe():
     """)
     conn.commit()
     cursor.close()
-    conn.close()
 
 def convert_id_to_int(df):
     df['video_id'] = pd.to_numeric(df['video_id'], errors='coerce')
@@ -89,10 +87,8 @@ def obtener_datos_tiktok(api, country):
     df['created_at_bbdd'] = datetime.now()
     return convert_id_to_int(df)
 
-def guardar_datos_en_postgres(df):
-    conn = psycopg2.connect(DATABASE_URL)
+def guardar_datos_en_postgres(conn, df):
     cursor = conn.cursor()
-
     for _, row in df.iterrows():
         cursor.execute("""
             INSERT INTO tendencias_tiktok (
@@ -114,26 +110,29 @@ def guardar_datos_en_postgres(df):
             'plays', 'likes', 'shares', 'comments', 'creation_date',
             'country', 'download_date', 'report_name', 'created_at_bbdd'
         ]))
-
     conn.commit()
     cursor.close()
-    conn.close()
 
-if __name__ == "__main__":
+def main():
     try:
-        crear_tabla_si_no_existe()
+        print("📡 Conectando a PostgreSQL...")
+        conn = psycopg2.connect(DATABASE_URL)
+        crear_tabla_si_no_existe(conn)
+
+        print("🔑 Autenticando con TikAPI...")
         api = TikAPI(API_KEY)
         df = obtener_datos_tiktok(api, COUNTRY_NAME)
 
         if df.empty:
             print("⚠️ No se obtuvieron datos desde TikAPI.")
         else:
-            print(f"📊 {len(df)} filas obtenidas.")
-            guardar_datos_en_postgres(df)
+            print(f"📊 {len(df)} filas obtenidas. Guardando...")
+            guardar_datos_en_postgres(conn, df)
+            print("✅ Datos guardados correctamente.")
 
-    except ValidationException as e:
-        print(f"❌ Validación fallida: {e}")
-    except ResponseException as e:
-        print(f"❌ Error de respuesta: {e}")
+        conn.close()
     except Exception as e:
         print(f"❌ Error inesperado: {str(e)}")
+
+if __name__ == "__main__":
+    main()
