@@ -2,8 +2,8 @@ name: Actualizar base de datos TikTok
 
 on:
   schedule:
-    - cron: '*/15 * * * *'  # Cada 15 minutos
-  workflow_dispatch:        # Para ejecutarlo manualmente desde GitHub
+    - cron: '*/15 * * * *'  # Ejecuta cada 15 minutos
+  workflow_dispatch:        # Permite ejecutarlo manualmente
 
 jobs:
   run-script:
@@ -26,5 +26,8 @@ jobs:
       - name: Ejecutar script principal
         env:
           API_KEY: ${{ secrets.API_KEY }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL}}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: python main.py
+
+      - name: Confirmar hora de ejecución
+        run: echo "🕒 Ejecutado en $(date)"
