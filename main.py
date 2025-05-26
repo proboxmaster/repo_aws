@@ -1,14 +1,12 @@
+import os
 import pandas as pd
 from tikapi import TikAPI, ValidationException, ResponseException
 from datetime import datetime
-import os
 import psycopg2
-from dotenv import load_dotenv
 
-# === CARGAR VARIABLES DEL ENTORNO ===
-load_dotenv()
 API_KEY = os.getenv("API_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL")
+
 REPORT_NAME = "DB_TENDENCIAS"
 COUNTRY_NAME = "ve"
 
